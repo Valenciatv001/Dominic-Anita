@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Country & Flag Flashcards</title>
+  <style>
+    /* Reset and General Layout */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #55c5a6; /* Teal background matching teacher's screenshot */
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* World Map Background Styling */
+    .map-background {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120%;
+      height: 120%;
+      opacity: 0.25; /* Low opacity behind the content */
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Container for everything */
+    .app-container {
+      position: relative;
+      z-index: 2; /* Sits above the background map */
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    /* Header styling */
+    h1 {
+      font-size: 32px;
+      color: #0b2427;
+      margin-bottom: 5px;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    p.subtitle {
+      font-size: 16px;
+      color: #1a4146;
+      margin-bottom: 15px;
+    }
+
+    /* 3x3 Card Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      width: 100%;
+      perspective: 800px; /* Needed for 3D flip effect */
+    }
+
+    /* Card Container */
+    .card-scene {
+      width: 100%;
+      height: 120px;
+      cursor: pointer;
+    }
+
+    /* The card that rotates */
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+
+    /* Class applied when card is flipped */
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* Front and Back face styling */
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Front Side: Country Name (Deep teal matching screenshot) */
+    .front {
+      background-color: #0e6f75;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .front:hover {
+      background-color: #0c5c62;
+    }
+
+    /* Back Side: Flag Emoji (Slightly darker slate matching flip state) */
+    .back {
+      background-color: #1c3d40;
+      transform: rotateY(180deg);
+    }
+
+    .back-flag {
+      font-size: 36px;
+      margin-bottom: 5px;
+    }
+
+    .back-name {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    /* Control Button (Shuffle) */
+    .btn-shuffle {
+      background-color: #0b2427;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      margin-top: 10px;
+    }
+
+    .btn-shuffle:hover {
+      background-color: #12373c;
+    }
+
+    .btn-shuffle:active {
+      transform: scale(0.97);
+    }
+
+    /* Responsive scaling for smaller phones */
+    @media (max-width: 450px) {
+      .card-scene {
+        height: 100px;
+      }
+      .front {
+        font-size: 14px;
+      }
+      .back-flag {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Simplified Vector World Map Background to match the teacher's example -->
+  <svg class="map-background" viewBox="0 0 1008 651" fill="#394548" xmlns="http://www.w3.org/2000/svg">
+    <path d="M140 220 C 130 200, 160 180, 190 190 C 210 195, 230 180, 250 210 C 270 240, 230 290, 200 300 C 170 310, 150 250, 140 220 Z" />
+    <path d="M350 450 C 320 400, 380 350, 410 370 C 440 390, 480 360, 470 410 C 460 460, 400 480, 370 490 C 340 500, 360 480, 350 450 Z" />
+    <path d="M580 220 C 590 170, 650 160, 680 180 C 720 200, 750 190, 790 230 C 820 260, 800 310, 770 330 C 730 350, 680 340, 640 310 C 600 280, 570 250, 580 220 Z" />
+    <path d="M720 430 C 710 400, 750 380, 780 390 C 800 400, 820 390, 830 410 C 840 430, 810 470, 780 480 C 750 490, 730 460, 720 430 Z" />
+    <path d="M220 120 C 210 100, 240 80, 270 90 C 290 100, 310 90, 320 110 C 330 130, 300 160, 270 170 C 240 180, 230 140, 220 120 Z" />
+  </svg>
+
+  <div class="app-container">
+    <h1>Country Flag Flashcards</h1>
+    <p class="subtitle">Click any card to flip and reveal the flag!</p>
+
+    <!-- 3x3 grid matching the layout of the screenshot -->
+    <div class="grid" id="grid">
+      <!-- 9 cards will be loaded here dynamically by JavaScript -->
+    </div>
+
+    <!-- Shuffle button to load a new set of 9 countries -->
+    <button class="btn-shuffle" onclick="loadNewSet()">Next Set 🔀</button>
+  </div>
+
+  <script>
+    // List of countries with their flags
+    const countries = [
+      { name: "Nigeria", flag: "🇳🇬" },
+      { name: "Ghana", flag: "🇬🇭" },
+      { name: "South Africa", flag: "🇿🇦" },
+      { name: "Kenya", flag: "🇰🇪" },
+      { name: "Ethiopia", flag: "🇪🇹" },
+      { name: "Egypt", flag: "🇪🇬" },
+      { name: "Morocco", flag: "🇲🇦" },
+      { name: "Algeria", flag: "🇩🇿" },
+      { name: "United States", flag: "🇺🇸" },
+      { name: "Canada", flag: "🇨🇦" },
+      { name: "Mexico", flag: "🇲🇽" },
+      { name: "Brazil", flag: "🇧🇷" },
+      { name: "Argentina", flag: "🇦🇷" },
+      { name: "United Kingdom", flag: "🇬🇧" },
+      { name: "France", flag: "🇫🇷" },
+      { name: "Germany", flag: "🇩🇪" },
+      { name: "Italy", flag: "🇮🇹" },
+      { name: "Spain", flag: "🇪🇸" },
+      { name: "Japan", flag: "🇯🇵" },
+      { name: "China", flag: "🇨🇳" },
+      { name: "India", flag: "🇮🇳" },
+      { name: "South Korea", flag: "🇰🇷" },
+      { name: "Australia", flag: "🇦🇺" },
+      { name: "New Zealand", flag: "🇳🇿" },
+      { name: "Yemen", flag: "🇾🇪" },
+      { name: "Andorra", flag: "🇦🇩" },
+      { name: "Jordan", flag: "🇯🇴" },
+      { name: "Netherlands", flag: "🇳🇱" },
+      { name: "Ivory Coast", flag: "🇨🇮" }
+    ];
+
+    // Function to load 9 random countries into the 3x3 grid
+    function loadNewSet() {
+      const gridContainer = document.getElementById("grid");
+      gridContainer.innerHTML = ""; // Clear existing cards
+
+      // Shuffle the list of countries and pick the first 9
+      const shuffled = [...countries].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 9);
+
+      // Create HTML for each card
+      selected.forEach(country => {
+        // Create the card-scene wrapper
+        const scene = document.createElement("div");
+        scene.className = "card-scene";
+
+        // Create the card element
+        const card = document.createElement("div");
+        card.className = "card";
+
+        // Flip card when clicked
+        scene.onclick = function() {
+          card.classList.toggle("flipped");
+        };
+
+        // Create front face (Country Name)
+        const frontFace = document.createElement("div");
+        frontFace.className = "card-face front";
+        frontFace.textContent = country.name;
+
+        // Create back face (Flag & Details)
+        const backFace = document.createElement("div");
+        backFace.className = "card-face back";
+        
+        const flagSpan = document.createElement("span");
+        flagSpan.className = "back-flag";
+        flagSpan.textContent = country.flag;
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "back-name";
+        nameSpan.textContent = country.name;
+
+        backFace.appendChild(flagSpan);
+        backFace.appendChild(nameSpan);
+
+        // Put card faces together
+        card.appendChild(frontFace);
+        card.appendChild(backFace);
+        scene.appendChild(card);
+
+        // Add to grid
+        gridContainer.appendChild(scene);
+      });
+    }
+
+    // Load the first set of cards on page load
+    loadNewSet();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoFlash - Country & Flag Flashcards</title>
+    <meta name="description"
+        content="Master world countries and their flags with modern, interactive flashcards and study guides.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* Theme variables - Cyber Dark Mode default */
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+            --card-bg-front: rgba(30, 41, 59, 0.75);
+            --card-bg-back: rgba(15, 23, 42, 0.9);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-glow: rgba(99, 102, 241, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --btn-bg: rgba(255, 255, 255, 0.03);
+            --btn-hover: rgba(255, 255, 255, 0.08);
+            --btn-active: rgba(255, 255, 255, 0.15);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            --glass-bg: rgba(30, 41, 59, 0.4);
+            --glass-blur: blur(12px);
+
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .light-theme {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-bg-front: rgba(255, 255, 255, 0.85);
+            --card-bg-back: rgba(248, 250, 252, 0.95);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --card-border-glow: rgba(99, 102, 241, 0.3);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.15);
+            --accent-success: #059669;
+            --accent-danger: #dc2626;
+            --btn-bg: rgba(0, 0, 0, 0.02);
+            --btn-hover: rgba(0, 0, 0, 0.06);
+            --btn-active: rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 760px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            z-index: 10;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-area h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #818cf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .icon-btn:hover {
+            background: var(--btn-hover);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Filters and Tabs Grid */
+        .dashboard-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modes-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .toggle-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 4px;
+            border-radius: 99px;
+            border: 1px solid var(--card-border);
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .continent-filters {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .continent-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-pill:hover {
+            background: var(--btn-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-pill.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* Stats Display */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-name {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        /* Progress indicators */
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .progress-container {
+            height: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-fill-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, #10b981 100%);
+            border-radius: 99px;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 3D Scene and Cards */
+        .scene-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .card-scene {
+            width: 100%;
+            max-width: 440px;
+            height: 280px;
+            perspective: 1200px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 24px;
+            padding: 2rem;
+            background: var(--card-bg-front);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .card-face::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .flashcard:hover .card-face {
+            border-color: var(--card-border-glow);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-glow);
+        }
+
+        .card-face.face-back {
+            transform: rotateY(180deg);
+            background: var(--card-bg-back);
+        }
+
+        .card-header-tag {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 4px 10px;
+            border-radius: 99px;
+        }
+
+        .card-main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .card-country-name {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        .card-flag-emoji {
+            font-size: 96px;
+            line-height: 1;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.3));
+        }
+
+        .card-footer-tip {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Quiz Mode UI */
+        .quiz-options-container {
+            width: 100%;
+            max-width: 440px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .quiz-option {
+            background: var(--card-bg-front);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            transform: translateX(4px);
+        }
+
+        .quiz-option:disabled {
+            cursor: default;
+        }
+
+        .quiz-option.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--accent-success) !important;
+            color: #10b981;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--accent-danger) !important;
+            color: #ef4444;
+        }
+
+        /* Navigation Controls */
+        .action-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--btn-hover);
+            border-color: var(--text-secondary);
+        }
+
+        button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Auto-play and extra controls */
+        .extra-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .autoplay-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .keyboard-legend {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .keyboard-legend kbd {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 4px;
+            padding: 1px 5px;
+            margin: 0 2px;
+            font-family: inherit;
+            color: var(--text-secondary);
+        }
+
+        /* List view / Explorer */
+        .explorer-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .explorer-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            width: 180px;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .explorer-card {
+            background: rgba(0, 0, 0, 0.12);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .explorer-card:hover {
+            border-color: var(--accent);
+            background: var(--btn-hover);
+        }
+
+        .explorer-card .ex-flag {
+            font-size: 28px;
+        }
+
+        .explorer-card .ex-name {
+            font-size: 10px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 99px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card-scene {
+                height: 240px;
+            }
+
+            .card-country-name {
+                font-size: 26px;
+            }
+
+            .card-flag-emoji {
+                font-size: 80px;
+            }
+
+            .app-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Celebratory Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="app-container">
+        <!-- Header Area -->
+        <header>
+            <div class="logo-area">
+                <h1>🌍 GeoFlash</h1>
+                <p>Master world flags and countries</p>
+            </div>
+            <div class="header-actions">
+                <!-- Theme Toggle -->
+                <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode"
+                    aria-label="Toggle Theme">🌓</button>
+                <!-- Sound FX Toggle -->
+                <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Mute/Unmute Audio FX"
+                    aria-label="Toggle Sound">🔊</button>
+            </div>
+        </header>
+
+        <!-- Main Study Settings & Filters -->
+        <div class="dashboard-panel">
+            <div class="modes-bar">
+                <!-- Study vs Quiz Mode -->
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="modeStudy" onclick="setMode('study')">Study Mode</button>
+                    <button class="toggle-btn" id="modeQuiz" onclick="setMode('quiz')">Quiz Mode</button>
+                </div>
+                <button class="btn-secondary" onclick="shuffleDeck()" style="padding: 6px 12px; font-size: 12px;"
+                    title="Shuffle current set">🔀 Shuffle</button>
+            </div>
+
+            <!-- Continent Selector Filter -->
+            <div class="continent-filters" id="continentBar">
+                <button class="filter-pill active" onclick="filterContinent('All')">All Continents</button>
+                <button class="filter-pill" onclick="filterContinent('Africa')">Africa</button>
+                <button class="filter-pill" onclick="filterContinent('Americas')">Americas</button>
+                <button class="filter-pill" onclick="filterContinent('Asia')">Asia</button>
+                <button class="filter-pill" onclick="filterContinent('Europe')">Europe</button>
+                <button class="filter-pill" onclick="filterContinent('Oceania')">Oceania</button>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <div class="progress-label-row">
+                    <span id="progressText">Progress: 0 / 0 seen</span>
+                    <span id="percentText">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-fill-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <!-- Stats Numbers Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="statIndex">1</div>
+                    <div class="stat-name">Active Card</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">—</div>
+                    <div class="stat-name">Deck Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statScore">0</div>
+                    <div class="stat-name">Correct (Quiz)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statHighScore">0</div>
+                    <div class="stat-name">Best Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Card Frame -->
+        <div class="scene-container">
+            <div class="card-scene" id="cardScene" onclick="handleCardClick()" title="Click to flip">
+                <div class="flashcard" id="card">
+                    <!-- Front Face (Default) -->
+                    <div class="card-face face-front">
+                        <span class="card-header-tag" id="frontTag">Continent</span>
+                        <div class="card-main-content">
+                            <span class="card-country-name" id="frontCountry">Loading…</span>
+                        </div>
+                        <span class="card-footer-tip">🖱️ Tap card to reveal flag</span>
+                    </div>
+                    <!-- Back Face (Revealed) -->
+                    <div class="card-face face-back">
+                        <span class="card-header-tag" id="backTag">Continent</span>
+                        <div class="card-main-content">
+                            <span class="card-flag-emoji" id="backFlag">🏳</span>
+                            <span class="card-country-name" id="backCountry"
+                                style="font-size: 18px; margin-top: 10px;">Country</span>
+                        </div>
+                        <span class="card-footer-tip">↩️ Click to flip back</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Interactive Options (Only visible in quiz mode) -->
+            <div class="quiz-options-container" id="quizOptions" style="display: none;">
+                <!-- Dynamically injected buttons -->
+            </div>
+        </div>
+
+        <!-- Standard Study mode Navigation Buttons -->
+        <div class="action-controls" id="navigationControls">
+            <button class="btn-secondary" id="prevBtn" onclick="navigateCard(-1)">← Previous</button>
+            <button class="btn-primary" onclick="flipCard()">Flip Card 🔄</button>
+            <button class="btn-primary" id="nextBtn" onclick="navigateCard(1)">Next →</button>
+        </div>
+
+        <!-- Auto-Play & Settings Panel -->
+        <div class="extra-controls">
+            <div class="autoplay-badge">
+                <button class="btn-secondary" id="playBtn" onclick="toggleAutoplay()"
+                    style="padding: 6px 12px; font-size: 12px;">▶ Play Autoplay</button>
+                <span id="autoplayStatus">Interval: 3s</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary);">
+                Mode: <strong id="activeModeText" style="color: var(--accent);">STUDY</strong>
+            </div>
+        </div>
+
+        <!-- Interactive Search and Explorer Drawer -->
+        <div class="explorer-panel">
+            <div class="explorer-header">
+                <h3>🌍 Deck Explorer</h3>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search country..."
+                    oninput="handleSearch()">
+            </div>
+            <div class="explorer-grid" id="explorerGrid">
+                <!-- Injected list of all filtered countries -->
+            </div>
+        </div>
+
+        <!-- Quick Help keyboard navigation guides -->
+        <footer class="keyboard-legend">
+            <p>⌨️ Keyboard shortcuts: <kbd>←</kbd> <kbd>→</kbd> Navigate · <kbd>Space</kbd> Flip card · <kbd>Q</kbd>
+                Toggle Quiz · <kbd>S</kbd> Shuffle · <kbd>A</kbd> Autoplay</p>
+        </footer>
+    </div>
+
+    <script>
+        // Complete structured countries list mapped with Continents
+        const originalCountries = [
+            // Africa
+            { name: "Nigeria", flag: "🇳🇬", continent: "Africa" },
+            { name: "Ghana", flag: "🇬🇭", continent: "Africa" },
+            { name: "South Africa", flag: "🇿🇦", continent: "Africa" },
+            { name: "Kenya", flag: "🇰🇪", continent: "Africa" },
+            { name: "Ethiopia", flag: "🇪🇹", continent: "Africa" },
+            { name: "Egypt", flag: "🇪🇬", continent: "Africa" },
+            { name: "Morocco", flag: "🇲🇦", continent: "Africa" },
+            { name: "Algeria", flag: "🇩🇿", continent: "Africa" },
+            { name: "Tanzania", flag: "🇹🇿", continent: "Africa" },
+            { name: "Uganda", flag: "🇺🇬", continent: "Africa" },
+            { name: "Senegal", flag: "🇸🇳", continent: "Africa" },
+            { name: "Ivory Coast", flag: "🇨🇮", continent: "Africa" },
+            { name: "Cameroon", flag: "🇨🇲", continent: "Africa" },
+            { name: "Angola", flag: "🇦🇴", continent: "Africa" },
+            { name: "Mozambique", flag: "🇲🇿", continent: "Africa" },
+            { name: "Zambia", flag: "🇿🇲", continent: "Africa" },
+            { name: "Zimbabwe", flag: "🇿🇼", continent: "Africa" },
+            { name: "Rwanda", flag: "🇷🇼", continent: "Africa" },
+            { name: "Somalia", flag: "🇸🇴", continent: "Africa" },
+            { name: "Sudan", flag: "🇸🇩", continent: "Africa" },
+            { name: "Libya", flag: "🇱🇾", continent: "Africa" },
+            { name: "Tunisia", flag: "🇹🇳", continent: "Africa" },
+            // Americas
+            { name: "United States", flag: "🇺🇸", continent: "Americas" },
+            { name: "Canada", flag: "🇨🇦", continent: "Americas" },
+            { name: "Mexico", flag: "🇲🇽", continent: "Americas" },
+            { name: "Brazil", flag: "🇧🇷", continent: "Americas" },
+            { name: "Argentina", flag: "🇦🇷", continent: "Americas" },
+            { name: "Colombia", flag: "🇨🇴", continent: "Americas" },
+            { name: "Chile", flag: "🇨🇱", continent: "Americas" },
+            { name: "Peru", flag: "🇵🇪", continent: "Americas" },
+            { name: "Venezuela", flag: "🇻🇪", continent: "Americas" },
+            { name: "Ecuador", flag: "🇪🇨", continent: "Americas" },
+            { name: "Cuba", flag: "🇨🇺", continent: "Americas" },
+            { name: "Jamaica", flag: "🇯🇲", continent: "Americas" },
+            { name: "Haiti", flag: "🇭🇹", continent: "Americas" },
+            { name: "Trinidad & Tobago", flag: "🇹🇹", continent: "Americas" },
+            // Europe
+            { name: "United Kingdom", flag: "🇬🇧", continent: "Europe" },
+            { name: "France", flag: "🇫🇷", continent: "Europe" },
+            { name: "Germany", flag: "🇩🇪", continent: "Europe" },
+            { name: "Italy", flag: "🇮🇹", continent: "Europe" },
+            { name: "Spain", flag: "🇪🇸", continent: "Europe" },
+            { name: "Portugal", flag: "🇵🇹", continent: "Europe" },
+            { name: "Netherlands", flag: "🇳🇱", continent: "Europe" },
+            { name: "Belgium", flag: "🇧🇪", continent: "Europe" },
+            { name: "Sweden", flag: "🇸🇪", continent: "Europe" },
+            { name: "Norway", flag: "🇳🇴", continent: "Europe" },
+            { name: "Denmark", flag: "🇩🇰", continent: "Europe" },
+            { name: "Finland", flag: "🇫🇮", continent: "Europe" },
+            { name: "Switzerland", flag: "🇨🇭", continent: "Europe" },
+            { name: "Austria", flag: "🇦🇹", continent: "Europe" },
+            { name: "Poland", flag: "🇵🇱", continent: "Europe" },
+            { name: "Ukraine", flag: "🇺🇦", continent: "Europe" },
+            { name: "Greece", flag: "🇬🇷", continent: "Europe" },
+            { name: "Turkey", flag: "🇹🇷", continent: "Europe" },
+            { name: "Russia", flag: "🇷🇺", continent: "Europe" },
+            { name: "Andorra", flag: "🇦🇩", continent: "Europe" },
+            { name: "Iceland", flag: "🇮🇸", continent: "Europe" },
+            { name: "Ireland", flag: "🇮🇪", continent: "Europe" },
+            { name: "Hungary", flag: "🇭🇺", continent: "Europe" },
+            { name: "Czech Republic", flag: "🇨🇿", continent: "Europe" },
+            { name: "Romania", flag: "🇷🇴", continent: "Europe" },
+            { name: "Bulgaria", flag: "🇧🇬", continent: "Europe" },
+            { name: "Serbia", flag: "🇷🇸", continent: "Europe" },
+            { name: "Croatia", flag: "🇭🇷", continent: "Europe" },
+            { name: "Slovakia", flag: "🇸🇰", continent: "Europe" },
+            { name: "Slovenia", flag: "🇸🇮", continent: "Europe" },
+            { name: "Estonia", flag: "🇪🇪", continent: "Europe" },
+            { name: "Latvia", flag: "🇱🇻", continent: "Europe" },
+            { name: "Lithuania", flag: "🇱🇹", continent: "Europe" },
+            { name: "Belarus", flag: "🇧🇾", continent: "Europe" },
+            { name: "Moldova", flag: "🇲🇩", continent: "Europe" },
+            // Asia
+            { name: "Japan", flag: "🇯🇵", continent: "Asia" },
+            { name: "China", flag: "🇨🇳", continent: "Asia" },
+            { name: "India", flag: "🇮🇳", continent: "Asia" },
+            { name: "South Korea", flag: "🇰🇷", continent: "Asia" },
+            { name: "Indonesia", flag: "🇮🇩", continent: "Asia" },
+            { name: "Pakistan", flag: "🇵🇰", continent: "Asia" },
+            { name: "Bangladesh", flag: "🇧🇩", continent: "Asia" },
+            { name: "Vietnam", flag: "🇻🇳", continent: "Asia" },
+            { name: "Thailand", flag: "🇹🇭", continent: "Asia" },
+            { name: "Malaysia", flag: "🇲🇾", continent: "Asia" },
+            { name: "Philippines", flag: "🇵🇭", continent: "Asia" },
+            { name: "Saudi Arabia", flag: "🇸🇦", continent: "Asia" },
+            { name: "UAE", flag: "🇦🇪", continent: "Asia" },
+            { name: "Israel", flag: "🇮🇱", continent: "Asia" },
+            { name: "Iran", flag: "🇮🇷", continent: "Asia" },
+            { name: "Iraq", flag: "🇮🇶", continent: "Asia" },
+            { name: "Afghanistan", flag: "🇦🇫", continent: "Asia" },
+            { name: "Jordan", flag: "🇯🇴", continent: "Asia" },
+            { name: "Lebanon", flag: "🇱🇧", continent: "Asia" },
+            { name: "Syria", flag: "🇸🇾", continent: "Asia" },
+            { name: "Yemen", flag: "🇾🇪", continent: "Asia" },
+            { name: "Kazakhstan", flag: "🇰🇿", continent: "Asia" },
+            { name: "Uzbekistan", flag: "🇺🇿", continent: "Asia" },
+            { name: "Myanmar", flag: "🇲🇲", continent: "Asia" },
+            { name: "Cambodia", flag: "🇰🇭", continent: "Asia" },
+            { name: "Sri Lanka", flag: "🇱🇰", continent: "Asia" },
+            { name: "Nepal", flag: "🇳🇵", continent: "Asia" },
+            { name: "Mongolia", flag: "🇲🇳", continent: "Asia" },
+            { name: "North Korea", flag: "🇰🇵", continent: "Asia" },
+            // Oceania
+            { name: "Australia", flag: "🇦🇺", continent: "Oceania" },
+            { name: "New Zealand", flag: "🇳🇿", continent: "Oceania" },
+            { name: "Papua New Guinea", flag: "🇵🇬", continent: "Oceania" },
+            { name: "Fiji", flag: "🇫🇯", continent: "Oceania" }
+        ];
+
+        // App State Configuration
+        let deck = [...originalCountries];
+        let currentIdx = 0;
+        let isFlipped = false;
+        let currentMode = 'study'; // 'study' or 'quiz'
+        let currentFilter = 'All';
+        let searchQuery = '';
+
+        // User progress trackers
+        let seenIndices = new Set();
+        let correctCount = 0;
+        let bestStreak = 0;
+        let currentStreak = 0;
+
+        // UI states
+        let soundEnabled = true;
+        let autoplayActive = false;
+        let autoplayIntervalId = null;
+        const autoplayDuration = 3000; // 3 seconds
+
+        // Synthesized Web Audio Controller
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTone(freq, type, duration) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.warn("Audio context not allowed or failed to initialize", e);
+            }
+        }
+
+        function playFlipSound() {
+            playTone(400, 'sine', 0.08);
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'triangle', 0.1); // C5
+            setTimeout(() => playTone(659.25, 'triangle', 0.15), 60); // E5
+        }
+
+        function playIncorrectSound() {
+            playTone(220, 'sawtooth', 0.22); // A3
+        }
+
+        function playSuccessSound() {
+            const notes = [261.63, 329.63, 392.00, 523.25]; // C chord
+            notes.forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 'sine', 0.3), i * 120);
+            });
+        }
+
+        // Toggle Themes
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            playFlipSound();
+        }
+
+        // Toggle Sounds
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundBtn = document.getElementById('soundBtn');
+            soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+            if (soundEnabled) {
+                playFlipSound();
+            }
+        }
+
+        // Setup Filter Bar Interaction
+        function filterContinent(continent) {
+            currentFilter = continent;
+            const buttons = document.getElementById('continentBar').getElementsByClassName('filter-pill');
+            for (let btn of buttons) {
+                if (btn.textContent.includes(continent)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+            applyFilters();
+            playFlipSound();
+        }
+
+        // Handle Search Box inputs
+        function handleSearch() {
+            searchQuery = document.getElementById('searchBox').value.trim().toLowerCase();
+            applyFilters();
+        }
+
+        // Apply Filter & Search modifications
+        function applyFilters() {
+            // Filter deck
+            deck = originalCountries.filter(c => {
+                const matchesContinent = (currentFilter === 'All' || c.continent === currentFilter);
+                const matchesSearch = c.name.toLowerCase().includes(searchQuery);
+                return matchesContinent && matchesSearch;
+            });
+
+            // Reset index to start of filtered set
+            currentIdx = 0;
+            seenIndices.clear();
+            isFlipped = false;
+            document.getElementById('card').classList.remove('is-flipped');
+
+            renderDeckInfo();
+            renderActiveCard();
+            renderExplorer();
+        }
+
+        // Change Active Mode: study vs quiz
+        function setMode(mode) {
+            if (currentMode === mode) return;
+            currentMode = mode;
+
+            const studyBtn = document.getElementById('modeStudy');
+            const quizBtn = document.getElementById('modeQuiz');
+            const navControls = document.getElementById('navigationControls');
+            const quizOptions = document.getElementById('quizOptions');
+            const activeModeText = document.getElementById('activeModeText');
+
+            if (mode === 'study') {
+                studyBtn.classList.add('active');
+                quizBtn.classList.remove('active');
+                navControls.style.display = 'flex';
+                quizOptions.style.display = 'none';
+                activeModeText.textContent = 'STUDY';
+                isFlipped = false;
+                document.getElementById('card').classList.remove('is-flipped');
+            } else {
+                studyBtn.classList.remove('active');
+                quizBtn.classList.add('active');
+                navControls.style.display = 'none';
+                quizOptions.style.display = 'grid';
+                activeModeText.textContent = 'QUIZ';
+
+                // In quiz, we show the card front (country name) and user picks flag
+                isFlipped = false;
+                document.getElementById('card').classList.remove('is-flipped');
+                generateQuizOptions();
+            }
+
+            playFlipSound();
+            renderActiveCard();
+        }
+
+        // Autoplay Controller
+        function toggleAutoplay() {
+            const playBtn = document.getElementById('playBtn');
+            if (autoplayActive) {
+                stopAutoplay();
+            } else {
+                initAudio(); // Initialize audio context on user action
+                autoplayActive = true;
+                playBtn.textContent = '⏸ Pause Autoplay';
+                playBtn.classList.add('active');
+
+                // Auto-run loop
+                autoplayIntervalId = setInterval(() => {
+                    if (!isFlipped) {
+                        flipCard();
+                    } else {
+                        navigateCard(1);
+                    }
+                }, autoplayDuration);
+            }
+        }
+
+        function stopAutoplay() {
+            const playBtn = document.getElementById('playBtn');
+            autoplayActive = false;
+            playBtn.textContent = '▶ Play Autoplay';
+            playBtn.classList.remove('active');
+            if (autoplayIntervalId) {
+                clearInterval(autoplayIntervalId);
+                autoplayIntervalId = null;
+            }
+        }
+
+        // Manual Flip Card Action
+        function flipCard() {
+            if (currentMode === 'quiz' && !isFlipped) {
+                // Can't flip manually in quiz until answered, or block manual flip entirely to maintain quiz rules
+                return;
+            }
+            isFlipped = !isFlipped;
+            document.getElementById('card').classList.toggle('is-flipped', isFlipped);
+            playFlipSound();
+        }
+
+        function handleCardClick() {
+            if (currentMode === 'study') {
+                flipCard();
+            }
+        }
+
+        // Card navigation handler
+        function navigateCard(dir) {
+            if (deck.length === 0) return;
+
+            let nextIdx = currentIdx + dir;
+            // Cycle around the deck boundary
+            if (nextIdx < 0) {
+                nextIdx = deck.length - 1;
+            } else if (nextIdx >= deck.length) {
+                nextIdx = 0;
+                // Celebratory sound when completed full deck loop
+                if (seenIndices.size >= deck.length) {
+                    triggerConfetti();
+                    playSuccessSound();
+                }
+            }
+
+            currentIdx = nextIdx;
+            isFlipped = false;
+            document.getElementById('card').classList.remove('is-flipped');
+
+            renderActiveCard();
+
+            if (currentMode === 'quiz') {
+                generateQuizOptions();
+            }
+
+            renderDeckInfo();
+        }
+
+        // Shuffler
+        function shuffleDeck() {
+            if (deck.length <= 1) return;
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            currentIdx = 0;
+            seenIndices.clear();
+            isFlipped = false;
+            document.getElementById('card').classList.remove('is-flipped');
+
+            playFlipSound();
+            renderActiveCard();
+            renderDeckInfo();
+            if (currentMode === 'quiz') {
+                generateQuizOptions();
+            }
+        }
+
+        // Generate Multiple Choice answers for Quiz Mode
+        function generateQuizOptions() {
+            const container = document.getElementById('quizOptions');
+            container.innerHTML = '';
+
+            if (deck.length === 0) return;
+
+            const correctCountry = deck[currentIdx];
+            const choices = [correctCountry];
+
+            // Select 3 random incorrect choices from original list
+            const pool = originalCountries.filter(c => c.name !== correctCountry.name);
+            const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+
+            for (let i = 0; i < Math.min(3, shuffledPool.length); i++) {
+                choices.push(shuffledPool[i]);
+            }
+
+            // Shuffle options layout list
+            choices.sort(() => 0.5 - Math.random());
+
+            choices.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.innerHTML = `<span>${option.flag} &nbsp; ${option.name}</span>`;
+                btn.onclick = () => submitQuizAnswer(btn, option.name === correctCountry.name);
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle Quiz choice selection
+        function submitQuizAnswer(selectedButton, isCorrectAnswer) {
+            // Disable further quiz button inputs until navigation
+            const buttons = document.getElementsByClassName('quiz-option');
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            if (isCorrectAnswer) {
+                selectedButton.classList.add('correct');
+                selectedButton.insertAdjacentHTML('beforeend', '<span>✓</span>');
+                correctCount++;
+                currentStreak++;
+                if (currentStreak > bestStreak) {
+                    bestStreak = currentStreak;
+                }
+                playCorrectSound();
+                triggerConfetti(15);
+            } else {
+                selectedButton.classList.add('incorrect');
+                selectedButton.insertAdjacentHTML('beforeend', '<span>✗</span>');
+                currentStreak = 0;
+                playIncorrectSound();
+
+                // Find correct one and highlight it green
+                const correctCountry = deck[currentIdx];
+                for (let btn of buttons) {
+                    if (btn.textContent.includes(correctCountry.name)) {
+                        btn.classList.add('correct');
+                    }
+                }
+            }
+
+            // Update UI Stats
+            document.getElementById('statScore').textContent = correctCount;
+            document.getElementById('statHighScore').textContent = bestStreak;
+
+            // Flip the flashcard to show confirmation
+            isFlipped = true;
+            document.getElementById('card').classList.add('is-flipped');
+
+            // Auto move next in 1.8 seconds if in autoplay
+            if (autoplayActive) {
+                setTimeout(() => {
+                    if (autoplayActive && currentMode === 'quiz') navigateCard(1);
+                }, 1800);
+            } else {
+                // Auto-navigate after 1.5 seconds even in manual quiz mode for smoother play
+                setTimeout(() => {
+                    if (currentMode === 'quiz' && document.getElementById('card').classList.contains('is-flipped')) {
+                        navigateCard(1);
+                    }
+                }, 1600);
+            }
+        }
+
+        // Update Deck labels and stats
+        function renderDeckInfo() {
+            const total = deck.length;
+            document.getElementById('statTotal').textContent = total;
+
+            if (total === 0) {
+                document.getElementById('statIndex').textContent = '0';
+                document.getElementById('progressText').textContent = 'No cards match criteria';
+                document.getElementById('percentText').textContent = '0%';
+                document.getElementById('progressBar').style.width = '0%';
+                return;
+            }
+
+            document.getElementById('statIndex').textContent = currentIdx + 1;
+
+            // Tracker
+            seenIndices.add(currentIdx);
+            const seenCount = seenIndices.size;
+            const pct = ((seenCount / total) * 100).toFixed(0);
+
+            document.getElementById('progressText').textContent = `Seen: ${seenCount} / ${total} countries`;
+            document.getElementById('percentText').textContent = `${pct}%`;
+            document.getElementById('progressBar').style.width = `${pct}%`;
+        }
+
+        // Render current card faces content
+        function renderActiveCard() {
+            if (deck.length === 0) {
+                document.getElementById('frontCountry').textContent = 'No matching countries';
+                document.getElementById('frontTag').textContent = 'Empty Set';
+                document.getElementById('backCountry').textContent = '';
+                document.getElementById('backFlag').textContent = '🏳';
+                document.getElementById('backTag').textContent = 'Empty Set';
+                return;
+            }
+
+            const currentObj = deck[currentIdx];
+
+            document.getElementById('frontCountry').textContent = currentObj.name;
+            document.getElementById('frontTag').textContent = currentObj.continent;
+
+            document.getElementById('backCountry').textContent = currentObj.name;
+            document.getElementById('backFlag').textContent = currentObj.flag;
+            document.getElementById('backTag').textContent = currentObj.continent;
+        }
+
+        // Explorer drawer renderer
+        function renderExplorer() {
+            const grid = document.getElementById('explorerGrid');
+            grid.innerHTML = '';
+
+            deck.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'explorer-card';
+                if (index === currentIdx) {
+                    card.style.borderColor = 'var(--accent)';
+                    card.style.background = 'var(--accent-glow)';
+                }
+                card.onclick = () => {
+                    stopAutoplay();
+                    currentIdx = index;
+                    isFlipped = false;
+                    document.getElementById('card').classList.remove('is-flipped');
+                    renderActiveCard();
+                    renderDeckInfo();
+                    if (currentMode === 'quiz') {
+                        generateQuizOptions();
+                    }
+                    playFlipSound();
+                };
+
+                card.innerHTML = `
+          <span class="ex-flag">${item.flag}</span>
+          <span class="ex-name" title="${item.name}">${item.name}</span>
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Canvas Confetti Celebratory Particles
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctx = confettiCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class ConfettiParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 4;
+                this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * -10 - 4;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+                this.gravity = 0.3;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.rotation += this.rotationSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function triggerConfetti(count = 80) {
+            const x = window.innerWidth / 2;
+            const y = window.innerHeight * 0.7;
+            for (let i = 0; i < count; i++) {
+                particles.push(new ConfettiParticle(x, y));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            particles = particles.filter(p => p.y < window.innerHeight && p.x > 0 && p.x < window.innerWidth);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Global Event Listeners & Keyboard support
+        document.addEventListener("keydown", e => {
+            // Ignore key events if user typing in search field
+            if (document.activeElement === document.getElementById('searchBox')) {
+                return;
+            }
+
+            const key = e.key.toLowerCase();
+            if (e.key === "ArrowRight") {
+                stopAutoplay();
+                navigateCard(1);
+            } else if (e.key === "ArrowLeft") {
+                stopAutoplay();
+                navigateCard(-1);
+            } else if (e.key === " ") {
+                e.preventDefault();
+                stopAutoplay();
+                flipCard();
+            } else if (key === "s") {
+                stopAutoplay();
+                shuffleDeck();
+            } else if (key === "q") {
+                setMode(currentMode === 'study' ? 'quiz' : 'study');
+            } else if (key === "a") {
+                toggleAutoplay();
+            }
+        });
+
+        // Start App
+        applyFilters();
+
+    </script>
+</body>
+
+</html>
