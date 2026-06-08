@@ -270,6 +270,12 @@
         const card = document.createElement("div");
         card.className = "card";
         scene.onclick = function() {
+          // Find if there is any other card currently flipped, and flip it back
+          const currentlyFlipped = document.querySelector(".card.flipped");
+          if (currentlyFlipped && currentlyFlipped !== card) {
+            currentlyFlipped.classList.remove("flipped");
+          }
+          // Flip the clicked card
           card.classList.toggle("flipped");
         };
 
