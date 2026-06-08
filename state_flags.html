@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>US States & Capitals Flashcards</title>
+  <style>
+    /* Reset and General Layout */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #6c5ce7; /* Elegant purple background matching the teacher's pattern style */
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    /* Decorative US Outline Background Overlay */
+    .map-background {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 110%;
+      height: 110%;
+      opacity: 0.15;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Main Card Dashboard */
+    .app-container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #1e1550;
+      margin-bottom: 5px;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    p.subtitle {
+      font-size: 16px;
+      color: #2d2466;
+      margin-bottom: 15px;
+    }
+
+    /* 3 Rows and 4 Columns Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      perspective: 1000px; /* Perspective for 3D card flips */
+    }
+
+    /* Card scene container */
+    .card-scene {
+      width: 100%;
+      height: 110px;
+      cursor: pointer;
+    }
+
+    /* Rotational card body */
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+
+    /* Flip transition state class */
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* Face style shared rules */
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Front side (State Name in deep blue) */
+    .front {
+      background-color: #1b4f72;
+      font-size: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .front:hover {
+      background-color: #153e5b;
+    }
+
+    /* Back side (Capital Name in deep slate grey) */
+    .back {
+      background-color: #2c3e50;
+      transform: rotateY(180deg);
+    }
+
+    .back-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a0aab2;
+      margin-bottom: 4px;
+    }
+
+    .back-capital {
+      font-size: 16px;
+    }
+
+    /* Shuffle trigger button */
+    .btn-shuffle {
+      background-color: #1e1550;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      margin-top: 10px;
+    }
+
+    .btn-shuffle:hover {
+      background-color: #2b1f70;
+    }
+
+    .btn-shuffle:active {
+      transform: scale(0.97);
+    }
+
+    /* Responsive adjustments for mid/small devices */
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr); /* Switch to 3 columns on tablets */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr); /* Switch to 2 columns on mobile phones */
+      }
+      .card-scene {
+        height: 90px;
+      }
+      .front {
+        font-size: 13px;
+      }
+      .back-capital {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background decorative vector element -->
+  <svg class="map-background" viewBox="0 0 100 100" fill="none" stroke="#2d2466" stroke-width="0.5" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="40" stroke-dasharray="2 2" />
+    <path d="M20,50 Q40,30 50,50 T80,50" />
+    <path d="M30,30 Q50,70 70,30" />
+  </svg>
+
+  <div class="app-container">
+    <h1>State & Capital Flashcards</h1>
+    <p class="subtitle">Click any card to flip and reveal its Capital city!</p>
+
+    <!-- 3 rows and 4 columns grid (12 cards total) -->
+    <div class="grid" id="grid">
+      <!-- Injected dynamically by JavaScript -->
+    </div>
+
+    <button class="btn-shuffle" onclick="loadNewSet()">Next Set 🔀</button>
+  </div>
+
+  <script>
+    // List of Nigerian States and their corresponding Capital cities
+    const stateCapitals = [
+      { state: "Abia", capital: "Umuahia" },
+      { state: "Adamawa", capital: "Yola" },
+      { state: "Akwa Ibom", capital: "Uyo" },
+      { state: "Anambra", capital: "Awka" },
+      { state: "Bauchi", capital: "Bauchi" },
+      { state: "Bayelsa", capital: "Yenagoa" },
+      { state: "Benue", capital: "Makurdi" },
+      { state: "Borno", capital: "Maiduguri" },
+      { state: "Cross River", capital: "Calabar" },
+      { state: "Delta", capital: "Asaba" },
+      { state: "Ebonyi", capital: "Abakaliki" },
+      { state: "Edo", capital: "Benin City" },
+      { state: "Ekiti", capital: "Ado-Ekiti" },
+      { state: "Enugu", capital: "Enugu" },
+      { state: "Gombe", capital: "Gombe" },
+      { state: "Imo", capital: "Owerri" },
+      { state: "Jigawa", capital: "Dutse" },
+      { state: "Kaduna", capital: "Kaduna" },
+      { state: "Kano", capital: "Kano" },
+      { state: "Katsina", capital: "Katsina" },
+      { state: "Kebbi", capital: "Birnin Kebbi" },
+      { state: "Kogi", capital: "Lokoja" },
+      { state: "Kwara", capital: "Ilorin" },
+      { state: "Lagos", capital: "Ikeja" },
+      { state: "Nasarawa", capital: "Lafia" },
+      { state: "Niger", capital: "Minna" },
+      { state: "Ogun", capital: "Abeokuta" },
+      { state: "Ondo", capital: "Akure" },
+      { state: "Osun", capital: "Oshogbo" },
+      { state: "Oyo", capital: "Ibadan" },
+      { state: "Plateau", capital: "Jos" },
+      { state: "Rivers", capital: "Port Harcourt" },
+      { state: "Sokoto", capital: "Sokoto" },
+      { state: "Taraba", capital: "Jalingo" },
+      { state: "Yobe", capital: "Damaturu" },
+      { state: "Zamfara", capital: "Gusau" },
+      { state: "FCT (Abuja)", capital: "Abuja" }
+    ];
+
+    // Function to load 12 random states into the 3x4 grid
+    function loadNewSet() {
+      const gridContainer = document.getElementById("grid");
+      gridContainer.innerHTML = ""; // Clear existing grid HTML
+
+      // Shuffle and slice first 12 items
+      const shuffled = [...stateCapitals].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 12);
+
+      // Render cards
+      selected.forEach(item => {
+        // Card wrapper
+        const scene = document.createElement("div");
+        scene.className = "card-scene";
+
+        // Flip card trigger
+        const card = document.createElement("div");
+        card.className = "card";
+        scene.onclick = function() {
+          card.classList.toggle("flipped");
+        };
+
+        // Front Face (State Name)
+        const frontFace = document.createElement("div");
+        frontFace.className = "card-face front";
+        frontFace.textContent = item.state;
+
+        // Back Face (Capital City)
+        const backFace = document.createElement("div");
+        backFace.className = "card-face back";
+        
+        const label = document.createElement("span");
+        label.className = "back-label";
+        label.textContent = "Capital";
+
+        const capitalText = document.createElement("span");
+        capitalText.className = "back-capital";
+        capitalText.textContent = item.capital;
+
+        backFace.appendChild(label);
+        backFace.appendChild(capitalText);
+
+        // Append to hierarchy
+        card.appendChild(frontFace);
+        card.appendChild(backFace);
+        scene.appendChild(card);
+        gridContainer.appendChild(scene);
+      });
+    }
+
+    // Initialize first grid deck
+    loadNewSet();
+  </script>
+</body>
+</html>
